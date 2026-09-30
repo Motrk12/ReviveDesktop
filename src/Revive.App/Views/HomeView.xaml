@@ -1,0 +1,156 @@
+<UserControl x:Class="Revive.App.Views.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Revive.App.ViewModels"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:MainViewModel}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="940" Margin="32,28,32,32">
+
+            <!-- Header -->
+            <StackPanel Orientation="Horizontal">
+                <Image Source="/Assets/Revive.ico" Width="44" Height="44" RenderOptions.BitmapScalingMode="HighQuality" />
+                <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="Revive" FontFamily="{StaticResource DisplayFont}" FontSize="26" FontWeight="SemiBold" Foreground="{StaticResource Text}" />
+                    <TextBlock Style="{StaticResource Secondary}" FontSize="14"
+                               Text="Get back deleted photos, videos and files. Revive only reads your drives and never changes or uploads anything." />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Step 1 -->
+            <TextBlock Style="{StaticResource Heading}" Margin="0,30,0,4" Text="1. Where did you lose the files?" />
+            <TextBlock Style="{StaticResource Secondary}" Text="Pick the Recycle Bin, a drive, or a memory card. Plug in the USB stick, SD card or camera first." />
+            <ItemsControl ItemsSource="{Binding Locations}" Margin="-6,12,-6,0">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:LocationViewModel}">
+                        <RadioButton Style="{StaticResource CardRadio}" GroupName="Location" Width="301" Margin="6"
+                                     IsChecked="{Binding IsSelected, Mode=OneWay}"
+                                     Command="{Binding DataContext.SelectLocationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                     CommandParameter="{Binding}"
+                                     AutomationProperties.Name="{Binding Title}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Border Width="40" Height="40" CornerRadius="10" Background="#EEF2FA" VerticalAlignment="Top">
+                                    <TextBlock Style="{StaticResource Icon}" Text="{Binding Glyph}" FontSize="20" HorizontalAlignment="Center" Foreground="{StaticResource Accent}" />
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14" Foreground="{StaticResource Text}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Subtitle}" Style="{StaticResource Secondary}" FontSize="12.5" Margin="0,2,0,0" />
+                                    <TextBlock Text="{Binding Warning}" FontSize="12" Foreground="{StaticResource WarnText}" TextWrapping="Wrap" Margin="0,4,0,0">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Warning}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
+                        </RadioButton>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                <Button Style="{StaticResource LinkButton}" Command="{Binding RefreshDrivesCommand}" AutomationProperties.Name="Refresh drives">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource Icon}" Text="&#xE72C;" FontSize="12" Margin="0,0,6,0" />
+                        <TextBlock Text="Refresh drives" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource LinkButton}" Command="{Binding OpenImageCommand}" Margin="8,0,0,0" AutomationProperties.Name="Scan a disk image file">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource Icon}" Text="&#xE8E5;" FontSize="12" Margin="0,0,6,0" />
+                        <TextBlock Text="Scan a disk image file…" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <!-- Administrator hint -->
+            <Border Background="{StaticResource WarnBg}" BorderBrush="{StaticResource WarnLine}" BorderThickness="1" CornerRadius="10"
+                    Padding="16,12" Margin="0,14,0,0" Visibility="{Binding ShowAdminHint, Converter={StaticResource BoolToVisibility}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Style="{StaticResource Icon}" Text="&#xEA18;" FontSize="20" Foreground="{StaticResource WarnText}" />
+                    <StackPanel Grid.Column="1" Margin="12,0">
+                        <TextBlock Text="Administrator permission needed" FontWeight="SemiBold" Foreground="{StaticResource WarnText}" />
+                        <TextBlock Style="{StaticResource Secondary}" Foreground="{StaticResource WarnText}"
+                                   Text="To look for deleted files, Revive has to read the drive directly, which Windows only allows for administrators. Revive still only reads; it never writes to the drive." />
+                    </StackPanel>
+                    <Button Grid.Column="2" Style="{StaticResource SecondaryButton}" Command="{Binding RestartAsAdminCommand}" VerticalAlignment="Center" AutomationProperties.Name="Restart as administrator">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource Icon}" Text="&#xEA18;" FontSize="13" Margin="0,0,8,0" />
+                            <TextBlock Text="Restart as administrator" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Step 2 -->
+            <StackPanel Visibility="{Binding ShowScanModes, Converter={StaticResource BoolToVisibility}}">
+                <TextBlock Style="{StaticResource Heading}" Margin="0,28,0,4" Text="2. How thorough should the search be?" />
+                <UniformGrid Columns="2" Margin="-6,8,-6,0">
+                    <RadioButton Style="{StaticResource CardRadio}" GroupName="Mode" Margin="6" IsChecked="{Binding QuickScan}" AutomationProperties.Name="Quick scan">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{StaticResource Icon}" Text="&#xE945;" FontSize="16" Foreground="{StaticResource Accent}" />
+                                <TextBlock Text="Quick scan" FontWeight="SemiBold" FontSize="14" Margin="8,0" Foreground="{StaticResource Text}" />
+                                <Border Background="{StaticResource GoodBg}" CornerRadius="8" Padding="7,1">
+                                    <TextBlock Text="Start here" FontSize="11.5" Foreground="{StaticResource GoodText}" />
+                                </Border>
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource Secondary}" Margin="0,6,0,0" FontSize="13"
+                                       Text="Finds recently deleted files with their original names and folders. Usually takes seconds to a few minutes." />
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton Style="{StaticResource CardRadio}" GroupName="Mode" Margin="6" IsChecked="{Binding DeepScan}" AutomationProperties.Name="Deep scan">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{StaticResource Icon}" Text="&#xE721;" FontSize="16" Foreground="{StaticResource Accent}" />
+                                <TextBlock Text="Deep scan" FontWeight="SemiBold" FontSize="14" Margin="8,0" Foreground="{StaticResource Text}" />
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource Secondary}" Margin="0,6,0,0" FontSize="13"
+                                       Text="Also searches every free sector for photos, videos, music and documents, even after formatting. Can take an hour or more on big drives." />
+                        </StackPanel>
+                    </RadioButton>
+                </UniformGrid>
+            </StackPanel>
+
+            <!-- Tip + start -->
+            <Grid Margin="0,28,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Border Background="{StaticResource Surface}" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="10" Padding="14,10" Margin="0,0,20,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource Icon}" Text="&#xE82F;" FontSize="16" Foreground="#CA8A04" VerticalAlignment="Top" Margin="0,1,10,0" />
+                        <TextBlock Style="{StaticResource Secondary}" FontSize="13" MaxWidth="560"
+                                   Text="Stop saving anything to the drive you lost files on. Every new file, photo or app install can overwrite the files you want back." />
+                    </StackPanel>
+                </Border>
+                <Button Grid.Column="1" Style="{StaticResource PrimaryButton}" Command="{Binding StartScanCommand}" FontSize="15" Padding="26,12" VerticalAlignment="Center" AutomationProperties.Name="Start scan">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Start scan" />
+                        <TextBlock Style="{StaticResource Icon}" Text="&#xE72A;" FontSize="13" Margin="10,1,0,0" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
