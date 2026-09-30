@@ -5,9 +5,12 @@ hard drives and the Recycle Bin. It only ever **reads** the drive being recovere
 
 ![Revive icon](src/Revive.App/Assets/Revive-256.png)
 
+**[Download Revive.exe](https://github.com/Motrk12/ReviveDesktop/releases/latest)** for Windows 10/11 (64-bit). It's a single file with nothing to install.
+
 ## Using it
 
-1. Run `Revive.exe` (from `publish\`, or build it yourself, see below).
+1. Run `Revive.exe`. If Windows SmartScreen says "Windows protected your PC", choose **More info** and then **Run anyway**
+   (the app isn't code-signed yet). You can also build it yourself; see below.
 2. Pick where the files were lost: the Recycle Bin, a drive, a memory card, or a disk image file.
    Reading a drive directly needs administrator rights; Revive offers to restart itself as administrator.
 3. Choose **Quick scan** (seconds to minutes, keeps original names and folders) or **Deep scan**
